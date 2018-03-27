@@ -1,0 +1,64 @@
+- name: Ensure docker is installed
+  tags: deploy
+  apt: name=docker.io state=present
+- name: Ensure pip is installed
+  tags: deploy
+  apt: name=python-pip state=present
+- name: Ensure emacs is installed
+  tags: deploy
+  apt: name=emacs state=present
+- name: Install docker py
+  tags: deploy
+  pip:
+    name: docker-py
+- name: Install jenkins-job-builder
+  tags: deploy
+  pip:
+    name: jenkins-job-builder
+- name: Pull jenkins docker image
+  tags: deploy
+  docker_image:
+    name: jenkins/jenkins:lts
+- name: Create Jenkins container
+  tags: deploy
+  docker_container:
+    name: romey-jenkins
+    image: jenkins/jenkins:lts
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - "{{ admin_dir }}:/home/admin"
+- name: Wait for Jenkins to be running
+  tags: deploy
+  wait_for:
+    port: 8080
+    delay: 10
+- name: Get Initial Admin Password
+  tags: deploy
+  shell: docker exec romey-jenkins bin/cat /var/jenkins_home/secrets/initialAdminPassword
+  register: initialpass
+- name: Print Password
+  tags: deploy
+  debug: msg={{ initialpass.stdout }}
+- name: create jenkins-job dir
+  tags: configure
+  file:
+    path: "{{ jenkins_jobs_dir }}"
+    state: directory
+- name: copy rendered jenkins-job config
+  tags: configure
+  template:
+    src: jenkins_jobs.ini.j2
+    dest: "{{ jenkins_jobs_conf }}"
+- name: put test script
+  tags: configure
+  shell: echo "echo Test" > {{ admin_dir }}/test.sh
+- name: copy jenkins job to jenkins job dir
+  tags: configure
+  copy:
+    dest: "{{ jenkins_jobs_dir }}"
+    src: jobs/
+- name: run jobs builder
+  tags: configure
+  shell: jenkins-jobs --conf "{{ jenkins_jobs_conf }}" update "{{ jenkins_jobs_dir }}"

@@ -1,0 +1,7 @@
+---
+jenkins_user: "{{ lookup('env', 'JENKINS_USER') }}"
+jenkins_password: "{{ lookup('env', 'JENKINS_PASSWORD') }}"
+jenkins_jobs_builder_dir: "{{ lookup('env', 'JENKINS_JOBS_DIR')|default('/etc/jenkins_jobs', true) }}"
+jenkins_jobs_dir: "{{ jenkins_jobs_builder_dir}}/jobs"
+jenkins_jobs_conf: "{{ jenkins_jobs_builder_dir }}/jenkins_jobs.ini"
+admin_dir: "/home/{{ ansible_user }}"

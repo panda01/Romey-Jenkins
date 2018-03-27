@@ -1,0 +1,63 @@
+00 08,09,10,11,12,13,14,15,16,17 * * 1,2,3,4,5 curl https://cronitor.link/QTBpUX/run -m 10 ; /home/admin/edi/items.sh && curl https://cronitor.link/QTBpUX/complete -m 10
+
+# order submittal for EDI
+#00,30 08,09,10,11,13,14,15,16,17 * * 1,2,3,4,5 /home/admin/edi/salesorders.sh
+#07 12 * * 1,2,3,4,5 /home/admin/edi/salesorders.sh
+00,30 08,09,10,11,13,14,15,16,17 * * 1,2,3,4,5 curl https://cronitor.link/2o6CEp/run -m 10 ; /home/admin/edi/salesorders.sh && curl https://cronitor.link/2o6CEp/complete -m 10
+07 12 * * 1,2,3,4,5 curl https://cronitor.link/nNlphr/run -m 10 ; /home/admin/edi/salesorders.sh && curl https://cronitor.link/nNlphr/complete -m 10
+
+# invoice creation for EDI
+#*/5 12,13,14,15,16,17,18,19,20,21,22 * * 1-5 /home/admin/edi/shipconfirmation.sh
+*/5 12,13,14,15,16,17,18,19,20,21,22 * * 1-5 curl https://cronitor.link/82DIuX/run -m 10 ; /home/admin/edi/shipconfirmation.sh && curl https://cronitor.link/82DIuX/complete -m 10
+
+# edi daily backup
+#00 02 * * * /home/admin/edi/VerifyItems/verify-items.sh
+00 02 * * * curl https://cronitor.link/BuQpff/run -m 10 ; /home/admin/edi/VerifyItems/verify-items.sh && curl https://cronitor.link/BuQpff/complete -m 10
+
+# Postgres Daily backup
+00 02 * * * curl https://cronitor.link/y7uG07/run -m 10 ; /home/admin/scripts/pg_backup_daily.sh && curl https://cronitor.link/y7uG07/complete -m 10
+
+# Postgres Hourly backup & scripts
+#00 08,09,10,11,12,13,14,15,16,17,18,19,20,21 * * * /home/admin/scripts/pg_backup_hourly.sh
+00 08,09,10,11,12,13,14,15,16,17,18,19,20,21 * * * curl https://cronitor.link/mF2IHA/run -m 10 ;  /home/admin/scripts/pg_backup_hourly.sh && curl https://cronitor.link/mF2IHA/complete -m 10
+#00 * * * * /home/admin/scripts/hourly-sql.sh
+00 * * * * curl https://cronitor.link/0qeIvb/run -m 10 ;  /home/admin/scripts/hourly-sql.sh && curl https://cronitor.link/0qeIvb/complete -m 10
+
+# Postgres Monthly backup
+#00 00 01 * * /home/admin/scripts/pg_backup_monthly.sh
+00 00 01 * * curl https://cronitor.link/UyVpdN/run -m 10 ; /home/admin/scripts/pg_backup_monthly.sh && curl https://cronitor.link/UyVpdN/complete -m 10
+
+# Letsencrypt cert renewal
+30 2 * * 1 certbot renew
+
+# Daily Reports
+05 07 * * 1,2,3,4,5,6 /home/admin/reports/emailreport.sh DailySalesMngmt
+# 05 07 * * 1,2,3,4,5,6 /home/admin/reports/emailreport.sh DailySalesExec
+08 12 * * 1,2,3,4,5 /home/admin/reports/emailreport.sh OrdersSubmitted
+07 07 * * 1,2,3,4,5 /home/admin/add-fotos/confirm-images.sh
+05 07 * * 1,2,3,4,5 /home/admin/reports/emailreport.sh DailyDSI
+#05 04 * * 1,2,3,4,5,6 /home/admin/romey-dw/update-sales.sh
+
+# Datawarehouse Scripts
+05 04 * * 1,2,3,4,5,6 curl https://cronitor.link/pv7Iwt/run -m 10 ; /home/admin/romey-dw/update-sales.sh && curl https://cronitor.link/pv7Iwt/complete -m 10
+
+# Weekly Reports
+05 07 * * 1 /home/admin/reports/emailreport.sh DSI
+07 07 * * 5 /home/admin/reports/emailreport.sh CustNoPurch
+17 07 * * 5 /home/admin/reports/emailreport.sh Preorders
+07 00 * * 1 /home/admin/reports/emailreport.sh SalesMetrics
+07 07 * * 1 /home/admin/reports/emailreport.sh SalesProdCatDetail
+05 07 * * 1 /home/admin/reports/emailreport.sh WeeklySalesMngmt
+
+# Monthly Reports
+05 07 1 * * /home/admin/reports/emailreport.sh CustList
+06 07 20 * * /home/admin/reports/emailreport.sh CuotaPlan
+#07 07 20 * * /home/admin/reports/adhoc/custnopurch/*.plx
+15 07 1 * * /home/admin/reports/emailreport.sh NewProdSales
+05 07 3 * * /home/admin/reports/emailreport.sh ContractorPay
+05 07 3 * * /home/admin/reports/emailreport.sh ServProf
+05 07 5 * * /home/admin/reports/emailreport.sh VendorPurchasing
+00 07 1 * * /home/admin/reports/emailreport.sh SalesClose
+10 07 1 * * /home/admin/reports/emailreport.sh SalesRepClose
+05 06 1 * * /home/admin/reports/emailreport.sh DSI
+07 15 1 * * /home/admin/reports/emailreport.sh SalesProdCatDetail

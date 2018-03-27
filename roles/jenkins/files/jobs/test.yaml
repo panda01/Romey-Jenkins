@@ -1,0 +1,8 @@
+- job:
+    name: 'Test functioality'
+    description: 'Jenkins Test'
+    disabled: true
+    triggers:
+      timed: '* * * * *'
+    build:
+      shell: /home/admin/test.sh
