@@ -59,6 +59,13 @@
   copy:
     dest: "{{ jenkins_jobs_dir }}"
     src: jobs/
+- name: Ensure the latest version of PBR is installed
+  tags: configure
+  pip:
+    name: pbr
+    extra_args: --upgrade
+  environment:
+    LC_ALL: C
 - name: run jobs builder
   tags: configure
   shell: jenkins-jobs --conf "{{ jenkins_jobs_conf }}" update "{{ jenkins_jobs_dir }}"
