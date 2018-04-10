@@ -54,6 +54,13 @@
 - name: put test script
   tags: configure
   shell: echo "echo Test" > {{ admin_dir }}/test.sh
+- name: adjust test script perms
+  tags: configure
+  file:
+    owner: admin
+    group: users
+    mode: 0755
+    path: "{{ admin_dir }}/test.sh"
 - name: copy jenkins job to jenkins job dir
   tags: configure
   copy:

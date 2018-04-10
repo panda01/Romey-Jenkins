@@ -3,6 +3,6 @@
     description: 'Jenkins Test'
     disabled: true
     triggers:
-      timed: '* * * * *'
-    build:
-      shell: /home/admin/test.sh
+      - timed: '* * * * *'
+    builders:
+      - shell: "/home/admin/test.sh"
