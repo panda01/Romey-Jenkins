@@ -69,6 +69,7 @@ $ export JENKINS_PASSWORD=supersecretpassword
 
 This will be used by ansible to configure your Jenkins installations with the jobs defined in `roles/jenkins/files/jobs/`
 
+
 Finally run the configure tasks with:
 
 
@@ -77,6 +78,34 @@ $ make configure
 ```
 
 At the end of these steps, you'll be able to return to you're host's Jenkins services (accessible on them via port `8080`), and verify that the jobs you want are defined, enabled, and running appropriately.
+
+
+NOTE: That once the first user is created, `initialAdminPassword` no longer exists.
+
+### Exposing via HTTPS with Nginx
+
+Before running the following steps, ensure that NGINX is configured and that a minimal virtual host configurations for the domain you're trying to use exists at `/etc/nginx/sites-enabled`. Once this is setup, correctly install and configure [Let's Encrypt's certbot](https://certbot.eff.org/) with the NGINX plugin.
+
+
+If the above is generate a cert *on the host(s)* with
+
+```bash
+$ sudo certbot --authenticator standalone --installer nginx -d <your_domain> —pre-hook "service nginx stop" --post-hook "service nginx start"
+```
+
+If your domain and the paths to the certificate and key do not match the defaults found in `group_vars/jenkins.yml`, then ensure that they are exported to your *local* environment like:
+
+```bash
+$ export JENKINS_DOMAIN=<your_domain>
+$ export JENKINS_CERT_PATH=<path_to_cert_on_host>
+$ export JENKINS_KEY_PATH=<path_to_key_on_host>
+```
+
+Once everything is in place, run:
+
+```bash
+$ make configure-nginx
+```
 
 
 ## Extending

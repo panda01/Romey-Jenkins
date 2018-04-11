@@ -1,7 +1,7 @@
 HOSTS ?= instance_hosts
 PRIVATE_KEY ?= ~/.ssh/id_rsa
 .DEFAULT_GOAL := help
-.PHONY: check help deploy configure test-check test-setup test-deploy test-configure
+.PHONY: check help deploy configure test-check test-setup test-deploy test-configure configure-nginx
 
 
 check: ## check to make sure tools are installed
@@ -12,6 +12,9 @@ deploy:  ## deploy jenkins on the hosts defined at "instance_hosts"
 
 configure:  ## configure the jenkins hosts
 	ansible-playbook --private-key=$(PRIVATE_KEY) -i $(HOSTS) playbook.yaml --tags "configure" --ask-vault-pass -e@vaulted_vars.yml
+
+configure-nginx:  ## configure nginx on the host to serve Jenkins via HTTPS
+	ansible-playbook --private-key=$(PRIVATE_KEY) -i $(HOSTS) playbook.yaml --tags "nginx" --ask-vault-pass -e@vaulted_vars.yml
 
 test-check: check  ## check to make sure testing tools are installed
 	bundle --version

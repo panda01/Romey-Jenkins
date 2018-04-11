@@ -11,6 +11,20 @@
   tags: deploy
   pip:
     name: docker-py
+  # We use UFW to ensure that control control incoming connections
+  # limiting them to SSH and (NGINX)
+- name: Ensure UFW is installed
+  tags: deploy
+  apt: name=ufw state=present
+- name: Setup SSH firewall
+  tags: deploy
+  ufw:
+    rule: allow
+    name: OpenSSH
+- name: Enable UFW
+  tags: deploy
+  ufw:
+    state: enabled
 - name: Install jenkins-job-builder
   tags: deploy
   pip:
@@ -21,14 +35,19 @@
     name: jenkins/jenkins:lts
 - name: Create Jenkins container
   tags: deploy
+  # we set network_mode to host so that the container's localhost
+  # may point to the host
+  # allowing it to listen incoming connections from it's host
   docker_container:
     name: romey-jenkins
     image: jenkins/jenkins:lts
-    ports:
-      - "8080:8080"
     volumes:
       - jenkins_home:/var/jenkins_home
       - "{{ admin_dir }}:/home/admin"
+    network_mode: "host"
+    restart: yes
+    env:
+      JENKINS_OPTS: --httpListenAddress=127.0.0.1
 - name: Wait for Jenkins to be running
   tags: deploy
   wait_for:
@@ -76,3 +95,26 @@
 - name: run jobs builder
   tags: configure
   shell: jenkins-jobs --conf "{{ jenkins_jobs_conf }}" update "{{ jenkins_jobs_dir }}"
+  # TODO: Do not assume that letsencrypt was used / exists
+  # TODO: Do not assume that NGIX is present
+- name: Setup NGINX firewall
+  tags: nginx
+  ufw:
+    rule: allow
+    name: Nginx Full
+- name: render NGINX config
+  tags: nginx
+  template:
+    src: jenkins.romeyinc.net
+    dest: "{{ nginx_sites_available_dir }}/jenkins.romeyinc.net"
+- name: enable jenkins.romeyinc.net
+  tags: nginx
+  file:
+    src: "{{ nginx_sites_available_dir }}/jenkins.romeyinc.net"
+    dest: "{{ nginx_sites_enabled_dir }}/jenkins.romeyinc.net"
+    state: link
+- name: restart NGINX
+  tags: nginx
+  service:
+    name: nginx
+    state: restarted
