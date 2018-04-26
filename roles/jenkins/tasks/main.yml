@@ -41,7 +41,6 @@
   docker_container:
     name: romey-jenkins
     image: jenkins/jenkins:lts
-    # user: admin
     volumes:
       - jenkins_home:/var/jenkins_home
       - "{{ admin_dir }}:/home/admin"
